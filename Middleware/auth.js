@@ -27,3 +27,8 @@ module.exports.isAccountActive = async(req , res, next)=>{
     }
     next();
 }
+
+module.exports.isAdmin = async(req , res , next)=>{
+    if(req.user.isAdmin) next();
+    else return res.status(403).json({err : "You are not allowed to perform this action"});
+}

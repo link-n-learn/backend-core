@@ -11,7 +11,7 @@ const { authenticateRequest, isAccountActive } = require('../Middleware/auth')
 
 const router = express.Router()
 
-const accessTokenExpiryTime = 60 * 2
+const accessTokenExpiryTime = 60 * 20
 
 router.post('/signup' , validateSignup ,  async (req, res , next)=>{
     try{
