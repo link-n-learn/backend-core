@@ -3,13 +3,17 @@ const { authenticateRequest, isAdmin, isAccountActive } = require('../Middleware
 const Category = require('../Models/Category');
 const Course = require('../Models/Course');
 const router = express.Router();
+const {imageUpload} = require("../Utils/uploader")
 
 router.post('/details'  , authenticateRequest , isAccountActive, async (req , res , next)=>{
     try{
-        const {title , descp , categoryId} = req.body;
+        const result = await imageUpload(req.files?.thumbnail)
+        req.fields.image = result.secure_url
+
+        const {title , descp , categoryId} = req.fields;
         if(!title || !descp || !categoryId) return res.status(400).json({err : "Required parameters missing"});
-        req.body.owner = req.user;
-        const newCourse = await Course.create(req.body);
+        req.fields.owner = req.user;
+        const newCourse = await Course.create(req.fields);
         return res.status(200).json({msg : "Course Details has been created" , newCourse});
     }catch(err){
         next(err)

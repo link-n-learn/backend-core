@@ -7,6 +7,10 @@ const CourseSchema = new mongoose.Schema({
         trim : true,
         maxLength : [50 , "max length is 50"],
     },
+    image : {
+        type : String,
+        required : [true , "Please upload thumbnail image"]
+    },
     descp : {
         type : String,
         required : [true , "please enter the description"],
