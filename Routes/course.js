@@ -4,17 +4,23 @@ const Category = require('../Models/Category');
 const Course = require('../Models/Course');
 const router = express.Router();
 const {imageUpload} = require("../Utils/uploader")
+const formidable = require('formidable')
 
 router.post('/details'  , authenticateRequest , isAccountActive, async (req , res , next)=>{
     try{
-        const result = await imageUpload(req.files?.thumbnail)
-        req.fields.image = result.secure_url
+        const form = formidable({multiples : true})
 
-        const {title , descp , categoryId} = req.fields;
-        if(!title || !descp || !categoryId) return res.status(400).json({err : "Required parameters missing"});
-        req.fields.owner = req.user;
-        const newCourse = await Course.create(req.fields);
-        return res.status(200).json({msg : "Course Details has been created" , newCourse});
+        form.parse(req , async(err , fields , files)=>{
+            if(err) next(err)
+            const result = await imageUpload(files?.thumbnail)
+            fields.image = result.secure_url
+
+            const {title , descp , categoryId} = fields;
+            if(!title || !descp || !categoryId) return res.status(400).json({err : "Required parameters missing"});
+            fields.owner = req.user;
+            const newCourse = await Course.create(fields);
+            return res.status(200).json({msg : "Course Details has been created" , newCourse});
+        })        
     }catch(err){
         next(err)
     }
