@@ -6,8 +6,8 @@ const router = express.Router();
 const {imageUpload} = require("../Utils/uploader")
 const formidable = require('formidable')
 
-// router.post('/details'  , authenticateRequest , isAccountActive, async (req , res , next)=>{
-    router.post("/details" , async (req , res , next)=>{
+router.post('/details'  , authenticateRequest , isAccountActive, async (req , res , next)=>{
+    // router.post("/details" , async (req , res , next)=>{
     try{
         const form = formidable({multiples : true})
         form.parse(req , async(err , fields , files)=>{
