@@ -9,7 +9,8 @@ cloudinary.config({
 module.exports.imageUpload = (image)=>{
     return new Promise(async(resolve , reject)=>{
         try{
-            const res = await cloudinary.uploader.upload(image.path , {folder : "linkedLearning"})
+            console.log("Going")
+            const res = await cloudinary.uploader.upload(image.filepath , {folder : "linkedLearning"})
             resolve(res)
         }catch(err){
             reject(err)

@@ -25,7 +25,13 @@ const CourseSchema = new mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : "category",
         required : [true , "Choose a category"]
-    }
+    },
+    syllabus : [
+            {
+                title : {type : String , required : true},
+                subTopics : {type : String , required : true}
+            }
+    ]
 } , {timestamps : true});
 
 module.exports = mongoose.model("Course" , CourseSchema)
