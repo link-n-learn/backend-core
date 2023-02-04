@@ -31,6 +31,17 @@ const CourseSchema = new mongoose.Schema({
                 title : {type : String , required : true},
                 subTopics : {type : String , required : true}
             }
+    ],
+    content : [
+        { //content section
+            title : {type : String , required : true},
+            secContent : [
+                {
+                    resourceType : {type : String , required : true},
+                    link : {type : String , required : true}
+                }
+            ]
+        }
     ]
 } , {timestamps : true});
 
