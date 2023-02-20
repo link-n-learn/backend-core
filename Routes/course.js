@@ -28,9 +28,12 @@ router.post('/details'  , authenticateRequest , isAccountActive, async (req , re
     }
 })
 
-router.get("/" , authenticateRequest , isAccountActive , async(req , res , next)=>{
+router.get("/" , async(req , res , next)=>{
     try{
-        const courses = await Course.find({owner : req.user._id});
+        const courses = await Course.find().populate("owner").limit(20).exec();
+        courses.forEach(course=>{
+            course.owner.password = undefined
+        })
         return res.status(200).json({courses : courses})
     }catch(err){
         next(err)

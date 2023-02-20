@@ -37,6 +37,7 @@ const CourseSchema = new mongoose.Schema({
             title : {type : String , required : true},
             secContent : [
                 {
+                    title : {type : String , required : true},
                     resourceType : {type : String , required : true},
                     link : {type : String , required : true}
                 }
