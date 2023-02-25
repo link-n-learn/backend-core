@@ -17,6 +17,7 @@ module.exports.authenticateRequest = async (req , res , next)=>{
             next(error)
            }  
        }catch(err){
+           console.log(err)
            return res.status(401).json({err : "Token has expired" , errCode : 2})
        }
 }

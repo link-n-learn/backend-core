@@ -4,6 +4,9 @@ const UserSchema = new mongoose.Schema({
     username : {type : String , requried : true},
     password : {type : String , required : true},
     email : {type : String , required : true},
+    enrolledCourses : [
+        {type : mongoose.Schema.Types.ObjectId , ref :"Course"}
+    ],
     isVerified : {type : Boolean , default : false},
     isActive : {type : Boolean , default : false},
     isAdmin : {type : Boolean , default : false}

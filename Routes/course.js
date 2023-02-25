@@ -2,6 +2,7 @@ const express = require('express');
 const { authenticateRequest, isAdmin, isAccountActive } = require('../Middleware/auth');
 const Category = require('../Models/Category');
 const Course = require('../Models/Course');
+const User = require("../Models/User")
 const router = express.Router();
 const {imageUpload} = require("../Utils/uploader")
 const formidable = require('formidable')
@@ -128,52 +129,6 @@ router.patch("/:courseId/content", authenticateRequest , isAccountActive , async
     }
 })
 
-//create a new section
-
-// router.post("/:courseId/content/section" , authenticateRequest , isAccountActive , async(req , res , next)=>{
-//     try{
-//         const {title , afterSectionId}= req.body
-//         if(!title) return res.status(400).json({err : "Required parameters missing"})
-//         const course = await Course.findById(req.params.courseId);
-//         if(!course) return res.status(404).json({err : "Course not found"})
-
-//         if(afterSectionId == '0'){
-//             //push
-//             course.content.push({title});
-//             await course.save()
-//         }else{
-//             //insert
-//             const index = course.content.findIndex(item => item._id.toString() == afterSectionId.toString())
-//             console.log(index)
-//             if(index == -1) return res.status(400).json({err : "The entered section is not found"})
-//             course.content.splice(index+1 , 0 , {title})
-//             await course.save();
-//         }
-
-//         return res.status(200).json({msg : "Section created"});
-//     }catch(err){
-//         next(err)
-//     }
-// })
-// router.patch("/:courseId/content" , authenticateRequest , isAccountActive , async(req , res , next)=>{
-//     try{
-//         const {resourceType} = req.query;
-//         const {link , sectionId} = req.body
-//         if(!resourceType || !sectionId || !link) return res.status(400).json({err : "Required parameters missing"})
-//         if(resourceType == 'video'){
-//             if(link.indexOf("youtube.com") == -1) return res.status(400).json({err : "Only youtube videos are supported"})
-//         }
-//         const course = await Course.findById(req.params.courseId)
-//         if(!course) return res.status(404).json({err : "Course not found"})
-//         const index = course.content.findIndex(item => item._id.toString() == sectionId.toString())
-//         if(index == -1) return res.status({err : "Provided section is not found"});
-//         course.content[index].secContent.push({resourceType , link})
-//         await course.save();
-//         return res.status(200).json({msg : "Resource added successfully"});
-//     }catch(err){
-//         next(err)
-//     }
-// })
 
 router.get("/:courseId/content" , async(req , res, next)=>{
     try{
@@ -185,4 +140,33 @@ router.get("/:courseId/content" , async(req , res, next)=>{
     }
 })
 
+//Enroll into courses
+router.patch("/:courseId/enroll" , authenticateRequest , isAccountActive , async(req , res , next)=>{
+    try{
+        const foundCourse = await Course.findById(req.params.courseId);
+        if(!foundCourse) return res.status(404).json({err : "Course not found"});
+        const thisUser = await User.findById(req.user._id)
+        //ensure not already enrolled
+        thisUser.enrolledCourses.forEach(course=>{
+            if(course._id.equals(req.params.courseId)) {
+                return res.status(409).json({err : "Already enrolled"})
+            }
+        })
+        thisUser.enrolledCourses.push(foundCourse._id);
+        await thisUser.save();
+        return res.status(200).json({msg : "Enrolled into course"})
+    }catch(err){
+        next(err)
+    }
+})
+
+//get all courses the user is enrolled in
+router.get("/enrolled" , authenticateRequest , isAccountActive , async(req, res , next)=>{
+    try{
+        const courses = await Course.find({_id : {$in : req.user.enrolledCourses}}).populate('categoryId').exec();
+        return res.status(200).json({enrolledCourses : courses})
+    }catch(err){
+        next(err)
+    }
+})
 module.exports = router;
