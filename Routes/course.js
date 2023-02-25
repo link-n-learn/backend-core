@@ -5,7 +5,8 @@ const Course = require('../Models/Course');
 const User = require("../Models/User")
 const router = express.Router();
 const {imageUpload} = require("../Utils/uploader")
-const formidable = require('formidable')
+const formidable = require('formidable');
+const Rating = require('../Models/Rating');
 
 router.post('/details'  , authenticateRequest , isAccountActive, async (req , res , next)=>{
     // router.post("/details" , async (req , res , next)=>{
@@ -168,5 +169,54 @@ router.get("/enrolled" , authenticateRequest , isAccountActive , async(req, res 
     }catch(err){
         next(err)
     }
+})
+
+//Ratings routes
+
+router.patch("/:course_id/rate" , authenticateRequest , isAccountActive , async(req , res , next)=>{
+    try{
+        const course = await Course.findById(req.params.course_id);
+        if(!req.query.rate) return res.status(400).json({err : "Required parameters missing"});
+        let rate = parseInt(req.query.rate)
+        if(rate > 5 || rate < 1) return res.status(400).json({err : "Invalid rate"})
+        const aleadyRated = await Rating.find({
+            courseId : req.params.course_id,
+            userId : req.user._id
+        })
+
+        console.log(aleadyRated)
+        if(aleadyRated.length > 0){
+            return res.status(409).json({err : "You have already rated this course"})
+        }
+        console.log("HIT")
+        const rating = await Rating.create({
+            rate : rate,
+            courseId : req.params.course_id,
+            userId : req.user._id
+        })
+        course.ratings.push(rating)
+        await course.save()
+        return res.status(200).json({msg : "Done. Thankyou for the rating"})
+    }catch(err){
+        next(err)
+    }
+})
+
+router.get("/:course_id/rate" , async(req , res, next)=>{
+    try{
+        const courseRatings = await Rating.find({
+            courseId : req.params.course_id
+        })
+        let rating = 0.0;
+        for(let i = 0 ; i < courseRatings.length ; i++){
+            console.log(rating)
+            rating = (rating + courseRatings[i].rate)/(i+1);
+        }
+        return res.status(200).json({overallRate : rating , count : courseRatings.length})
+    }
+    catch(err){
+        next(err)
+    }
+    
 })
 module.exports = router;

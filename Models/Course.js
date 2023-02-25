@@ -43,7 +43,8 @@ const CourseSchema = new mongoose.Schema({
                 }
             ]
         }
-    ]
+    ],
+    ratings : [{type : mongoose.Schema.Types.ObjectId , ref: "ratings"}]
 } , {timestamps : true});
 
 module.exports = mongoose.model("Course" , CourseSchema)
