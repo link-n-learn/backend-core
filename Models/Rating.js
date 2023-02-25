@@ -7,4 +7,4 @@ const RatingSchema = new mongoose.Schema({
     courseId : {type : mongoose.Schema.Types.ObjectId , ref:"Course"}
 } , {timestamps : true})
 
-module.exports = mongoose.model("rating" , RatingSchema)
+module.exports = mongoose.model("Rating" , RatingSchema)

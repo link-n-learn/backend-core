@@ -37,14 +37,18 @@ const CourseSchema = new mongoose.Schema({
             title : {type : String , required : true},
             secContent : [
                 {
-                    title : {type : String , required : true},
+                    title : {type : String , required : true },
                     resourceType : {type : String , required : true},
                     link : {type : String , required : true}
                 }
             ]
         }
     ],
-    ratings : [{type : mongoose.Schema.Types.ObjectId , ref: "ratings"}]
+    ratings : [{type : mongoose.Schema.Types.ObjectId , ref: "Rating"}]
 } , {timestamps : true});
 
+CourseSchema.index({title : "text" , descp : "text"} , {weights: {
+    title: 10,
+    descp: 5,
+  }},)
 module.exports = mongoose.model("Course" , CourseSchema)
