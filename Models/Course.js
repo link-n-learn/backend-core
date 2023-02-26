@@ -44,7 +44,8 @@ const CourseSchema = new mongoose.Schema({
             ]
         }
     ],
-    ratings : [{type : mongoose.Schema.Types.ObjectId , ref: "Rating"}]
+    ratings : [{type : mongoose.Schema.Types.ObjectId , ref: "Rating"}],
+    EnrollmentCount : {type : Number , default : 0}
 } , {timestamps : true});
 
 CourseSchema.index({title : "text" , descp : "text"} , {weights: {
