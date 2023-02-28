@@ -45,7 +45,7 @@ router.get("/" , async(req , res , next)=>{
 
 router.get("/details/:courseId" , authenticateRequest , isAccountActive,  async(req , res , next)=>{
     try{
-        const foundCourse = await Course.findById(req.params.courseId);
+        const foundCourse = await Course.findById(req.params.courseId).populate("owner").exec();
         if(!foundCourse) return res.status(404).json({err : "Requested resourse is not found"});
         //check if the logged in user can access this resource
         //if(foundCourse.owner != req.user._id) return res.status(403).json({err : "You are not allowed to view this resource"});
