@@ -44,17 +44,36 @@ router.post(
 
 router.get("/", async (req, res, next) => {
   try {
-    const courses = await Course.find()
-      .populate("owner")
-      .populate("ratings")
-      .populate("categoryId")
-      .limit(20)
-      .exec();
+    let courses = await Course.aggregate([{ $sample: { size: 40 } }]);
+    courses = await Course.populate(courses, {
+      path: "rating owner categoryId",
+    });
     courses.forEach((course) => {
       course.owner.password = undefined;
       course.owner.enrolledCourses = undefined;
     });
     return res.status(200).json({ courses: courses });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/bycat", async (req, res, next) => {
+  try {
+    const { categoryId } = req.query;
+    if (!categoryId) return res.status(400).json({ err: "Missing parameters" });
+    const courses = await Course.find({ categoryId: categoryId })
+      .populate("owner")
+      .populate("categoryId")
+      .populate("ratings")
+      .limit(40)
+      .exec();
+
+      courses.forEach((course) => {
+        course.owner.password = undefined;
+        course.owner.enrolledCourses = undefined;
+      });
+    return res.status(200).json({ courses });
   } catch (err) {
     next(err);
   }
@@ -69,9 +88,12 @@ router.get(
       const foundCourse = await Course.findById(req.params.courseId)
         .populate("owner")
         .populate("categoryId")
+        .populate("ratings")
         .exec();
       if (!foundCourse)
         return res.status(404).json({ err: "Requested resourse is not found" });
+      foundCourse.owner.password = undefined
+      foundCourse.owner.enrolledCourses = undefined
       //check if the logged in user can access this resource
       //if(foundCourse.owner != req.user._id) return res.status(403).json({err : "You are not allowed to view this resource"});
       return res.status(200).json({ foundCourse });
