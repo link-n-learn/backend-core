@@ -46,7 +46,7 @@ router.get("/", async (req, res, next) => {
   try {
     let courses = await Course.aggregate([{ $sample: { size: 40 } }]);
     courses = await Course.populate(courses, {
-      path: "rating owner categoryId",
+      path: "ratings owner categoryId",
     });
     courses.forEach((course) => {
       course.owner.password = undefined;
