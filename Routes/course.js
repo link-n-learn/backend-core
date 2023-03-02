@@ -279,7 +279,7 @@ router.get(
       const courses = await Course.find({
         _id: { $in: req.user.enrolledCourses },
       })
-        .populate("categoryId")
+        .populate("categoryId").populate("owner").populate("ratings")
         .exec();
       return res.status(200).json({ enrolledCourses: courses });
     } catch (err) {
