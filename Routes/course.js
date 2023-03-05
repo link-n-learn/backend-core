@@ -11,6 +11,7 @@ const router = express.Router();
 const { imageUpload } = require("../Utils/uploader");
 const formidable = require("formidable");
 const Rating = require("../Models/Rating");
+const Question = require("../Models/Question");
 
 router.post(
   "/details",
@@ -69,10 +70,10 @@ router.get("/bycat", async (req, res, next) => {
       .limit(40)
       .exec();
 
-      courses.forEach((course) => {
-        course.owner.password = undefined;
-        course.owner.enrolledCourses = undefined;
-      });
+    courses.forEach((course) => {
+      course.owner.password = undefined;
+      course.owner.enrolledCourses = undefined;
+    });
     return res.status(200).json({ courses });
   } catch (err) {
     next(err);
@@ -92,8 +93,8 @@ router.get(
         .exec();
       if (!foundCourse)
         return res.status(404).json({ err: "Requested resourse is not found" });
-      foundCourse.owner.password = undefined
-      foundCourse.owner.enrolledCourses = undefined
+      foundCourse.owner.password = undefined;
+      foundCourse.owner.enrolledCourses = undefined;
       //check if the logged in user can access this resource
       //if(foundCourse.owner != req.user._id) return res.status(403).json({err : "You are not allowed to view this resource"});
       return res.status(200).json({ foundCourse });
@@ -279,7 +280,9 @@ router.get(
       const courses = await Course.find({
         _id: { $in: req.user.enrolledCourses },
       })
-        .populate("categoryId").populate("owner").populate("ratings")
+        .populate("categoryId")
+        .populate("owner")
+        .populate("ratings")
         .exec();
       return res.status(200).json({ enrolledCourses: courses });
     } catch (err) {
@@ -399,4 +402,80 @@ router.get("/search", async (req, res, next) => {
     next(err);
   }
 });
+
+//discussion
+router.post(
+  "/:course_id/question",
+  authenticateRequest,
+  isAccountActive,
+  async (req, res, next) => {
+    try {
+      const course = await Course.findById(req.params.course_id);
+      if (!course) return res.status(404).json({ err: "Course is not found" });
+      const { question } = req.body;
+      console.log(question)
+      if (!question?.title)
+        return res.status(400).json({ err: "Required parameters are missing" });
+      question.owner = req.user._id;
+      const newQuestion = await Question.create(question);
+      course.questions.push(newQuestion);
+      await course.save();
+      return res.status(200).json({ msg: "Question created" });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.get(
+  "/:course_id/question",
+  authenticateRequest,
+  isAccountActive,
+  async (req, res, next) => {
+    try {
+      const course = await Course.findById(req.params.course_id)
+        .populate("questions")
+        .exec();
+      if (!course) return res.status(404).json({ err: "Course not found" });
+      return res.status(200).json({ questions: course.questions });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+//get question by id
+router.get(
+  "/:course_id/question/:question_id",
+  authenticateRequest,
+  isAccountActive,
+  async (req, res, next) => {
+    try {
+      const question = await Question.findById(req.params.question_id);
+      if (!question) return res.status(404).json({ err: "Course not found" });
+      return res.status(200).json({ question });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
+
+router.post(
+  "/:course_id/question/:question_id/answer",
+  authenticateRequest,
+  isAccountActive,
+  async (req, res, next) => {
+    try {
+      const foundQuestion = await Question.findById(req.params.question_id);
+      if (!foundQuestion)
+        return res.status(404).json({ err: "Question not found" });
+      req.body.answer.owner = req.user._id;
+      const answer = foundQuestion.answers.push(req.body.answer);
+      await foundQuestion.save();
+      return res.status(200).json({ msg: "Answer added", answer });
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 module.exports = router;
