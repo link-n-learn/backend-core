@@ -6,7 +6,10 @@ const AnswerSchema = new mongoose.Schema({
         ref : "user",
         required : true,
     },
-    answer : String
+    answer : {
+	type : String,
+	required : true
+    }
 })
 const QuestionSchema = new mongoose.Schema({
     title : {type : String , required : [true , "Please provide title"]},
