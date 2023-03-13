@@ -22,6 +22,9 @@ app.use('/auth' , authRoutes)
 const courseRoutes = require('./Routes/course');
 app.use( '/course', courseRoutes)
 
+const userRoutes = require("./Routes/user")
+app.use("/user" , userRoutes)
+
 
 app.use((err , req , res , next)=>{
     console.log(err)

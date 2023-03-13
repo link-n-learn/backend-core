@@ -451,8 +451,14 @@ router.get(
   isAccountActive,
   async (req, res, next) => {
     try {
-      const question = await Question.findById(req.params.question_id);
+      const question = await Question.findById(req.params.question_id).populate("owner").populate("answers.owner").exec();
       if (!question) return res.status(404).json({ err: "Course not found" });
+      question.owner.password = undefined
+      question.owner.enrolledCourses = undefined
+      question.answers.forEach(answer=>{
+        answer.owner.password = undefined;
+        answer.owner.enrolledCourses = undefined
+      })
       return res.status(200).json({ question });
     } catch (err) {
       next(err);
