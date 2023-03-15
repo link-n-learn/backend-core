@@ -435,6 +435,7 @@ router.get(
     try {
       const course = await Course.findById(req.params.course_id)
         .populate("questions")
+        .populate("owner")
         .exec();
       if (!course) return res.status(404).json({ err: "Course not found" });
       return res.status(200).json({ questions: course.questions });
