@@ -59,6 +59,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/created" , authenticateRequest , async (req , res, next)=>{
+  try{
+    const courses = await Course.find({owner : req.user._id})
+    return res.status(200).json({courses})
+  }catch(err){
+    next(err)
+  }
+})
+
 router.get("/bycat", async (req, res, next) => {
   try {
     const { categoryId } = req.query;
