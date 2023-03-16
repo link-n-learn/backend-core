@@ -443,7 +443,7 @@ router.get(
   async (req, res, next) => {
     try {
       const course = await Course.findById(req.params.course_id)
-        .populate({path : "questions" , populate : {path : "owner"}})
+        .populate({path : "questions" , populate : [{path : "owner"} , {path : "answers.owner"}]})
         .exec();
       if (!course) return res.status(404).json({ err: "Course not found" });
       return res.status(200).json({ questions: course.questions });
