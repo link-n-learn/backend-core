@@ -61,7 +61,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/created" , authenticateRequest , async (req , res, next)=>{
   try{
-    const courses = await Course.find({owner : req.user._id})
+    const courses = await Course.find({owner : req.user._id}).populate("owner").exec();
     return res.status(200).json({courses})
   }catch(err){
     next(err)
