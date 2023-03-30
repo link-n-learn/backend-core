@@ -373,7 +373,7 @@ router.get("/search", async (req, res, next) => {
       coursesRes = await Course.find({
         $text: { $search: title },
       })
-        .populate("ratings")
+        .populate("ratings categoryId owner")
         .exec();
     } else {
       coursesRes = await Course.find({
