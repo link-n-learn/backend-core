@@ -93,7 +93,7 @@ router.get("/bycat", async (req, res, next) => {
 
 router.get(
   "/details/:courseId",
-  authenticateRequest,
+  // authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -199,7 +199,7 @@ router.patch(
 
 router.get(
   "/:courseId/syllabus",
-  authenticateRequest,
+  // authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -417,7 +417,7 @@ router.get("/search", async (req, res, next) => {
 //discussion
 router.post(
   "/:course_id/question",
-  authenticateRequest,
+  // authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -440,7 +440,7 @@ router.post(
 
 router.get(
   "/:course_id/question",
-  authenticateRequest,
+  // authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -458,7 +458,7 @@ router.get(
 //get question by id
 router.get(
   "/:course_id/question/:question_id",
-  authenticateRequest,
+  // authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
