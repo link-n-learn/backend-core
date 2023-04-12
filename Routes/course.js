@@ -93,8 +93,8 @@ router.get("/bycat", async (req, res, next) => {
 
 router.get(
   "/details/:courseId",
-  // authenticateRequest,
-  // isAccountActive,
+  authenticateRequest,
+  isAccountActive,
   async (req, res, next) => {
     try {
       const foundCourse = await Course.findById(req.params.courseId)
@@ -199,8 +199,8 @@ router.patch(
 
 router.get(
   "/:courseId/syllabus",
-  // authenticateRequest,
-  // isAccountActive,
+  authenticateRequest,
+  isAccountActive,
   async (req, res, next) => {
     try {
       const course = await Course.findById(req.params.courseId);
@@ -417,7 +417,7 @@ router.get("/search", async (req, res, next) => {
 //discussion
 router.post(
   "/:course_id/question",
-  // authenticateRequest,
+  authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -440,7 +440,7 @@ router.post(
 
 router.get(
   "/:course_id/question",
-  // authenticateRequest,
+  authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
@@ -458,7 +458,7 @@ router.get(
 //get question by id
 router.get(
   "/:course_id/question/:question_id",
-  // authenticateRequest,
+  authenticateRequest,
   isAccountActive,
   async (req, res, next) => {
     try {
