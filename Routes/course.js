@@ -45,13 +45,11 @@ router.post(
 
 router.get("/", async (req, res, next) => {
   try {
-    let courses = await Course.aggregate([
-      { $sample: { size: 40 } },
-    ]);
+    let courses = await Course.aggregate([{ $sample: { size: 40 } }]);
     let i = 0;
-    for(i = 0 ; i < courses.length ; i++){
-      if(courses[i].isActive == false){
-        courses.splice(i , 1);
+    for (i = 0; i < courses.length; i++) {
+      if (courses[i].isActive == false) {
+        courses.splice(i, 1);
       }
     }
     courses = await Course.populate(courses, {
@@ -67,22 +65,24 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/created" , authenticateRequest , async (req , res, next)=>{
-  try{
-    const courses = await Course.find({owner : req.user._id}).populate({
-      path: "ratings owner categoryId",
-    }).exec();
-    return res.status(200).json({courses})
-  }catch(err){
-    next(err)
+router.get("/created", authenticateRequest, async (req, res, next) => {
+  try {
+    const courses = await Course.find({ owner: req.user._id })
+      .populate({
+        path: "ratings owner categoryId",
+      })
+      .exec();
+    return res.status(200).json({ courses });
+  } catch (err) {
+    next(err);
   }
-})
+});
 
 router.get("/bycat", async (req, res, next) => {
   try {
     const { categoryId } = req.query;
     if (!categoryId) return res.status(400).json({ err: "Missing parameters" });
-    const courses = await Course.find({ categoryId: categoryId})
+    const courses = await Course.find({ categoryId: categoryId })
       .populate("owner")
       .populate("categoryId")
       .populate("ratings")
@@ -112,8 +112,8 @@ router.get(
         .exec();
       if (!foundCourse)
         return res.status(404).json({ err: "Requested resourse is not found" });
-        console.log(foundC)
-      if(!foundCourse.isActive) return res.status("403").json({err : "Course disabled by admin"})
+      if (!foundCourse.isActive)
+        return res.status("403").json({ err: "Course disabled by admin" });
       foundCourse.owner.password = undefined;
       foundCourse.owner.enrolledCourses = undefined;
       //check if the logged in user can access this resource
@@ -252,7 +252,8 @@ router.get("/:courseId/content", async (req, res, next) => {
   try {
     const course = await Course.findById(req.params.courseId);
     if (!course) return res.status(404).json({ err: "Course not found" });
-    if(!course.isActive) return res.status(403).json({err : "Course disabled by admin"})
+    if (!course.isActive)
+      return res.status(403).json({ err: "Course disabled by admin" });
     return res.status(200).json({ content: course.content });
   } catch (err) {
     next(err);
@@ -269,7 +270,10 @@ router.patch(
       const foundCourse = await Course.findById(req.params.courseId);
       if (!foundCourse)
         return res.status(404).json({ err: "Course not found" });
-        if(!foundCourse.isActive) return res.status(403).json({err : "COurse has been disabled by admin"})
+      if (!foundCourse.isActive)
+        return res
+          .status(403)
+          .json({ err: "COurse has been disabled by admin" });
       const thisUser = await User.findById(req.user._id);
       //ensure not already enrolled
       const alreadyEnrolled = false;
@@ -302,7 +306,7 @@ router.get(
     try {
       const courses = await Course.find({
         _id: { $in: req.user.enrolledCourses },
-        isActive : true
+        isActive: true,
       })
         .populate("categoryId")
         .populate("owner")
@@ -385,7 +389,7 @@ router.get("/search", async (req, res, next) => {
     if (title) {
       coursesRes = await Course.find({
         $text: { $search: title },
-        isActive : true
+        isActive: true,
       })
         .populate("ratings categoryId owner")
         .exec();
@@ -438,7 +442,7 @@ router.post(
       const course = await Course.findById(req.params.course_id);
       if (!course) return res.status(404).json({ err: "Course is not found" });
       const { question } = req.body;
-      console.log(question)
+      console.log(question);
       if (!question?.title)
         return res.status(400).json({ err: "Required parameters are missing" });
       question.owner = req.user._id;
@@ -459,7 +463,10 @@ router.get(
   async (req, res, next) => {
     try {
       const course = await Course.findById(req.params.course_id)
-        .populate({path : "questions" , populate : [{path : "owner"} , {path : "answers.owner"}]})
+        .populate({
+          path: "questions",
+          populate: [{ path: "owner" }, { path: "answers.owner" }],
+        })
         .exec();
       if (!course) return res.status(404).json({ err: "Course not found" });
       return res.status(200).json({ questions: course.questions });
@@ -476,14 +483,17 @@ router.get(
   isAccountActive,
   async (req, res, next) => {
     try {
-      const question = await Question.findById(req.params.question_id).populate("owner").populate("answers.owner").exec();
+      const question = await Question.findById(req.params.question_id)
+        .populate("owner")
+        .populate("answers.owner")
+        .exec();
       if (!question) return res.status(404).json({ err: "Course not found" });
-      question.owner.password = undefined
-      question.owner.enrolledCourses = undefined
-      question.answers.forEach(answer=>{
+      question.owner.password = undefined;
+      question.owner.enrolledCourses = undefined;
+      question.answers.forEach((answer) => {
         answer.owner.password = undefined;
-        answer.owner.enrolledCourses = undefined
-      })
+        answer.owner.enrolledCourses = undefined;
+      });
       return res.status(200).json({ question });
     } catch (err) {
       next(err);
