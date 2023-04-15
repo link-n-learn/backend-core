@@ -52,8 +52,8 @@ const CourseSchema = new mongoose.Schema({
             type : mongoose.Schema.Types.ObjectId,
             ref : "Question"
         }
-    ]
-
+    ],
+    isActive : {type : Boolean , required : true , default : true}
 } , {timestamps : true});
 
 CourseSchema.index({title : "text" , descp : "text"} , {weights: {

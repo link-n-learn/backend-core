@@ -2,7 +2,7 @@ const express  = require("express")
 const formidable = require("formidable")
 const {authenticateRequest} = require("../Middleware/auth");
 const User = require("../Models/User");
-const { imageUpload } = require("../Utils/uploader");
+const { imageUpload, deleteImage } = require("../Utils/uploader");
 
 const router = express.Router();
 
@@ -22,9 +22,10 @@ router.put("/profilePic" , authenticateRequest , async (req , res, next)=>{
         const form = formidable({multiples : false})
         form.parse(req , async(err , fields , files)=>{
             if(err) next(err)
-            console.log(files)
-            const result = await imageUpload(files?.picture)
             const user = await User.findById(req.user._id);
+            console.log(files)
+            await deleteImage(user.image)
+            const result = await imageUpload(files?.picture)
             user.image = result.secure_url;
             await user.save()
             return res.status(200).json({msg : "Profile picture changed. It might take a while to reflect"})
