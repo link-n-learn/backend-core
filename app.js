@@ -15,27 +15,27 @@ app.use(cors());
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
 
-app.use(async (req, res, next) => {
-  const bodyCopy = JSON.parse(JSON.stringify(req.body));
-  const headerCopy = JSON.parse(JSON.stringify(req.headers));
-  headerCopy.authorization = undefined;
-  bodyCopy.password = undefined;
-  const logText =
-    `{ "ip_remote":"` +
-    req.socket.remoteAddress +
-    `"}` +
-    JSON.stringify(bodyCopy) +
-    JSON.stringify(headerCopy) +
-    JSON.stringify(headerCopy) +
-    `{ "method":"` +
-    req.method +
-    `"}` +
-    `{ "url":"` +
-    req.url +
-    `"}`;
-  await Log.create({ log: logText });
-  next();
-});
+// app.use(async (req, res, next) => {
+//   const bodyCopy = JSON.parse(JSON.stringify(req.body));
+//   const headerCopy = JSON.parse(JSON.stringify(req.headers));
+//   headerCopy.authorization = undefined;
+//   bodyCopy.password = undefined;
+//   const logText =
+//     `{ "ip_remote":"` +
+//     req.socket.remoteAddress +
+//     `"}` +
+//     JSON.stringify(bodyCopy) +
+//     JSON.stringify(headerCopy) +
+//     JSON.stringify(headerCopy) +
+//     `{ "method":"` +
+//     req.method +
+//     `"}` +
+//     `{ "url":"` +
+//     req.url +
+//     `"}`;
+//   await Log.create({ log: logText });
+//   next();
+// });
 const adminRoutes = require("./Routes/admin");
 app.use("/admin", adminRoutes);
 const authRoutes = require("./Routes/auth");
