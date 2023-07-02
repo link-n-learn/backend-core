@@ -105,8 +105,8 @@ router.get("/bycat", async (req, res, next) => {
 
 router.get(
   "/details/:courseId",
-  authenticateRequest,
-  isAccountActive,
+  // authenticateRequest,
+  // isAccountActive,
   async (req, res, next) => {
     try {
       const foundCourse = await Course.findById(req.params.courseId)
