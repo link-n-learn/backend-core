@@ -62,4 +62,12 @@ router.patch("/courses/:courseId/enable" , authenticateRequest , isAdmin , async
         next(err)
     }
 })
+router.patch("/deleteUnverifiedEmails" , authenticateRequest , isAdmin , async(req, res , next)=>{
+    try{
+        await User.deleteMany({isVerified : false});
+        return res.status(200).json({msg : "Deleted all unverified emails"})
+    }catch(err){
+        next(err)
+    }
+})
 module.exports = router

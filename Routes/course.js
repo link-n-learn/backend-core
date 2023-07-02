@@ -47,12 +47,13 @@ router.get("/", async (req, res, next) => {
   try {
     let courses = await Course.aggregate([{ $sample: { size: 40 } }]);
     let i = 0;
+    let outputCourses = [];
     for (i = 0; i < courses.length; i++) {
-      if (courses[i].isActive == false) {
-        courses.splice(i, 1);
+      if (courses[i].isActive) {
+        outputCourses.push(courses[i]);
       }
     }
-    courses = await Course.populate(courses, {
+    courses = await Course.populate(outputCourses, {
       path: "ratings owner categoryId",
     });
     courses.forEach((course) => {
