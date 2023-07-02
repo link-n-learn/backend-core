@@ -89,12 +89,15 @@ router.get("/bycat", async (req, res, next) => {
       .populate("ratings")
       .limit(40)
       .exec();
-
-    courses.forEach((course) => {
-      course.owner.password = undefined;
-      course.owner.enrolledCourses = undefined;
+    const outputCourses = [];
+    for(let i = 0 ; i < courses.length(); i++){
+      outputCourses.push(courses[i]);
+    }
+    outputCourses.forEach((course) => {
+      outputCourses.owner.password = undefined;
+      outputCourses.owner.enrolledCourses = undefined;
     });
-    return res.status(200).json({ courses });
+    return res.status(200).json({ courses : outputCourses });
   } catch (err) {
     next(err);
   }
