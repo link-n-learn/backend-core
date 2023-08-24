@@ -15,3 +15,7 @@ module.exports.validateSignup = async (req, res , next)=>{
         next(err)
     }
 }
+
+module.exports.cleanXSS = (text)=>{
+    return text.indexOf("javascript:") == -1
+}

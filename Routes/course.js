@@ -12,6 +12,7 @@ const { imageUpload } = require("../Utils/uploader");
 const formidable = require("formidable");
 const Rating = require("../Models/Rating");
 const Question = require("../Models/Question");
+const { cleanXSS } = require("../Utils/validators");
 
 router.post(
   "/details",
@@ -26,7 +27,7 @@ router.post(
         console.log(files);
         const result = await imageUpload(files?.thumbnail);
         fields.image = result.secure_url;
-
+        
         const { title, descp, categoryId } = fields;
         if (!title || !descp || !categoryId)
           return res.status(400).json({ err: "Required parameters missing" });
@@ -90,12 +91,14 @@ router.get("/bycat", async (req, res, next) => {
       .limit(40)
       .exec();
     const outputCourses = [];
-    for(let i = 0 ; i < courses.length(); i++){
-      outputCourses.push(courses[i]);
+    for(let i = 0 ; i < courses.length; i++){
+      if(courses[i].isActive){
+        outputCourses.push(courses[i]);
+      }
     }
     outputCourses.forEach((course) => {
-      outputCourses.owner.password = undefined;
-      outputCourses.owner.enrolledCourses = undefined;
+      course.owner.password = undefined;
+      course.owner.enrolledCourses = undefined;
     });
     return res.status(200).json({ courses : outputCourses });
   } catch (err) {
@@ -241,6 +244,17 @@ router.patch(
         return res
           .status(403)
           .json({ err: "You are not allowed to perform this operation" });
+      // req.body.content.forEach(section=>{
+      //   section.secContent.forEach(lecture=>{
+      //     console.log(cleanXSS(lecture.link))
+      //     if(!cleanXSS(lecture.link)) lecture.link = "invalid";
+      //   })
+      // })
+      for(let i = 0 ; i < req.body.content.length ;i++){
+        for(let j = 0 ; j < req.body.content[i].secContent.length ; j++){
+          if(!cleanXSS(req.body.content[i].secContent[j].link)) return res.status(403).json({err : "Invalid input recieved"})
+        }
+      }
       course.content = req.body.content;
       await course.save();
       return res
